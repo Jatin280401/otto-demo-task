@@ -1,0 +1,1018 @@
+{
+  "title": "EarnOut Backend \u2013 Project Handover Meeting",
+  "source": "synthetic demo meeting generated with macOS say",
+  "duration_s": 1486.08,
+  "language": "en",
+  "speakers": [
+    "Developer A",
+    "Developer B"
+  ],
+  "segments": [
+    {
+      "id": "gt-00",
+      "speaker": "Developer A",
+      "text": "Hi, thanks for joining the meeting. Today, I want to walk you through the EarnOut backend so you can understand how the complete system works, what we have implemented so far, and what still needs attention.",
+      "t_start": 0.0,
+      "t_end": 11.66
+    },
+    {
+      "id": "gt-01",
+      "speaker": "Developer B",
+      "text": "Sounds good. Before we get into the technical implementation, could you give me a brief overview of what EarnOut actually does and what the backend is responsible for?",
+      "t_start": 12.11,
+      "t_end": 21.19
+    },
+    {
+      "id": "gt-02",
+      "speaker": "Developer A",
+      "text": "Absolutely. EarnOut is essentially an AI-powered business-planning application. The main idea is that a founder provides information about their business problem, its context, and its impact. Based on that information, our backend uses AI to generate a complete business-planning structure.",
+      "t_start": 21.64,
+      "t_end": 38.62
+    },
+    {
+      "id": "gt-03",
+      "speaker": "Developer A",
+      "text": "This includes MVP, mission, vision and purpose generation. Potential solutions and organisational culture. Customer personas and market analysis. TAM, SAM and SOM calculations. Operating processes and business capabilities. O-NET occupation matching and Functional Job Analysis. Mental action sequences and Unity simulation scenes. Customer Value Proposition and business strategy. KPI generation and OKR cascades. Employee seats, weekly calendars and execution tracking.",
+      "t_start": 39.07,
+      "t_end": 71.12
+    },
+    {
+      "id": "gt-04",
+      "speaker": "Developer A",
+      "text": "Apart from the main business-planning workflow, we also have meetings, an AI meeting assistant called Otto, document knowledge management, chat, pitch-deck analysis, X-B-R-L reporting and management dashboards.",
+      "t_start": 71.57,
+      "t_end": 84.46
+    },
+    {
+      "id": "gt-05",
+      "speaker": "Developer B",
+      "text": "That's quite an extensive system. So, is everything handled through one backend application, or are these separate services?",
+      "t_start": 84.91,
+      "t_end": 92.77
+    },
+    {
+      "id": "gt-06",
+      "speaker": "Developer A",
+      "text": "The backend is primarily a single Python FastAPI application. We have separated its functionality into different modules and sub-applications to keep the code organised.",
+      "t_start": 93.22,
+      "t_end": 103.28
+    },
+    {
+      "id": "gt-07",
+      "speaker": "Developer B",
+      "text": "Could you explain the technology stack and how the different components communicate with each other?",
+      "t_start": 103.73,
+      "t_end": 108.79
+    },
+    {
+      "id": "gt-08",
+      "speaker": "Developer A",
+      "text": "Sure. Our main technologies are Python with FastAPI for backend development. Neo-four-jay Aura as our graph database and primary data store. Open-AI models integrated through Lang-Chain. Docker for containerisation and deployment. AWS services, particularly S3, for file storage. Send-Grid for email communication. Stream for meeting video and chat functionality. O-NET and external X-B-R-L APIs for external data integrations.",
+      "t_start": 109.24,
+      "t_end": 137.55
+    },
+    {
+      "id": "gt-09",
+      "speaker": "Developer A",
+      "text": "The main application is located in rag slash main dot py. We have separate modules such as rag slash utils dot py for database fetching, storing and helper functions. rag slash prompts dot py for most AI prompt templates. rag slash modular pipeline dot py for the staged mental-action generation pipeline.",
+      "t_start": 138.0,
+      "t_end": 156.13
+    },
+    {
+      "id": "gt-10",
+      "speaker": "Developer A",
+      "text": "rag slash shared dot py for LLM clients, model configuration, caching and Neo4j connectivity. rag slash tools for deterministic calculations, FJA scoring, calendar generation and Unity scene assembly. rag slash auth dot py for authentication. rag slash meeting dot py for meetings and invitations.",
+      "t_start": 156.58,
+      "t_end": 175.36
+    },
+    {
+      "id": "gt-11",
+      "speaker": "Developer A",
+      "text": "rag slash okr dot py for OKR spreadsheet operations. rag slash management dot py for management dashboards. rag slash pitch deck dot py for pitch-deck analysis. rag slash chat dot py, rag slash x-b-r-l dot py and rag slash n-l-p dot py for their respective functionalities.",
+      "t_start": 175.81,
+      "t_end": 193.26
+    },
+    {
+      "id": "gt-12",
+      "speaker": "Developer B",
+      "text": "You mentioned Neo4j is the primary database. Are we using any additional database for user information or application data?",
+      "t_start": 193.71,
+      "t_end": 201.4
+    },
+    {
+      "id": "gt-13",
+      "speaker": "Developer A",
+      "text": "No. Neo4j Aura is the only primary data store. We use a graph-based structure where most data is connected through the User node or carries a user-id property.",
+      "t_start": 201.85,
+      "t_end": 211.57
+    },
+    {
+      "id": "gt-14",
+      "speaker": "Developer A",
+      "text": "This allows us to maintain relationships between business information, departments, activities, employees, objectives and other entities. We also use Neo4j vector indexes for retrieval-augmented generation, particularly for the chat and document-related functionality.",
+      "t_start": 212.02,
+      "t_end": 228.71
+    },
+    {
+      "id": "gt-15",
+      "speaker": "Developer B",
+      "text": "Understood. So, the database structure is an important part of the entire application, not just a place to store records.",
+      "t_start": 229.16,
+      "t_end": 236.97
+    },
+    {
+      "id": "gt-16",
+      "speaker": "Developer A",
+      "text": "Exactly. The relationships are essential because many downstream modules depend on previously generated information being available in Neo4j.",
+      "t_start": 237.42,
+      "t_end": 245.98
+    },
+    {
+      "id": "gt-17",
+      "speaker": "Developer B",
+      "text": "Can you walk me through the actual onboarding pipeline? I'd like to understand how the information moves from the initial user input to the final business plan.",
+      "t_start": 246.43,
+      "t_end": 254.9
+    },
+    {
+      "id": "gt-18",
+      "speaker": "Developer A",
+      "text": "Of course. The onboarding process is a sequence of AI-powered generation steps. The first step is MVP generation. The founder provides their Problem, Context and Impact, which we call P-C-I.",
+      "t_start": 255.35,
+      "t_end": 267.85
+    },
+    {
+      "id": "gt-19",
+      "speaker": "Developer A",
+      "text": "The backend processes this information and generates the initial MVP structure. After that, we move through the following stages. First, Solution and Culture Generation.",
+      "t_start": 268.3,
+      "t_end": 278.61
+    },
+    {
+      "id": "gt-20",
+      "speaker": "Developer A",
+      "text": "We generate potential business solutions, allow the user to select one, and then generate the organisational culture and rituals. Second, Customer and Market Analysis.",
+      "t_start": 279.06,
+      "t_end": 289.32
+    },
+    {
+      "id": "gt-21",
+      "speaker": "Developer A",
+      "text": "We generate customer personas, operating processes and capabilities. Then we generate customer entry points, advertising messages, promotional strategies and competitor analysis. After that, the system calculates T-A-M, S-A-M and S-O-M.",
+      "t_start": 289.77,
+      "t_end": 305.71
+    },
+    {
+      "id": "gt-22",
+      "speaker": "Developer A",
+      "text": "Third, Business Process and Workforce Analysis. We identify key business steps and map them to O-NET occupations. We then perform Functional Job Analysis, or F-J-A, to understand the requirements of different activities.",
+      "t_start": 306.16,
+      "t_end": 320.43
+    },
+    {
+      "id": "gt-23",
+      "speaker": "Developer A",
+      "text": "Fourth, Mental Action and Unity. We generate mental-action sequences through a modular pipeline. This pipeline has multiple stages: Stage A, Initial planning and imaginal buffer. Stage B zero and Stage B, Klein frames.",
+      "t_start": 320.88,
+      "t_end": 335.34
+    },
+    {
+      "id": "gt-24",
+      "speaker": "Developer A",
+      "text": "Stage C, Execution and identity. Stage D, F-J-A scoring and cost-related information. Once the mental-action information is generated, a deterministic Python Unity compiler converts it into scene JSON.",
+      "t_start": 335.79,
+      "t_end": 349.13
+    },
+    {
+      "id": "gt-25",
+      "speaker": "Developer A",
+      "text": "Fifth, Strategy and Business Execution. We generate the Customer Value Proposition, strategy, ideal outcomes, KPIs and navigation strategy. Finally, we generate the OKR cascade from company-level objectives down to departments, teams and individual seats.",
+      "t_start": 349.58,
+      "t_end": 367.22
+    },
+    {
+      "id": "gt-26",
+      "speaker": "Developer A",
+      "text": "The system then generates weekly calendars for those seats.",
+      "t_start": 367.67,
+      "t_end": 370.79
+    },
+    {
+      "id": "gt-27",
+      "speaker": "Developer B",
+      "text": "So, each stage depends on the previous stage?",
+      "t_start": 371.24,
+      "t_end": 374.33
+    },
+    {
+      "id": "gt-28",
+      "speaker": "Developer A",
+      "text": "Correct. This is one of the most important things to understand about the backend. The routes don't directly pass their generated data to each other. Instead, each stage reads the previously stored information from Neo4j.",
+      "t_start": 374.78,
+      "t_end": 387.44
+    },
+    {
+      "id": "gt-29",
+      "speaker": "Developer A",
+      "text": "For example, if persona generation hasn't completed successfully, the operating-process generation may not have the information it needs. Therefore, when debugging an empty screen or missing output, we should first verify whether the earlier generation steps completed and stored their results correctly.",
+      "t_start": 387.89,
+      "t_end": 405.16
+    },
+    {
+      "id": "gt-30",
+      "speaker": "Developer B",
+      "text": "That makes sense. We should check the database and pipeline execution order before assuming that the AI prompt itself is faulty.",
+      "t_start": 405.61,
+      "t_end": 413.31
+    },
+    {
+      "id": "gt-31",
+      "speaker": "Developer A",
+      "text": "Exactly.",
+      "t_start": 413.76,
+      "t_end": 414.48
+    },
+    {
+      "id": "gt-32",
+      "speaker": "Developer B",
+      "text": "Let's discuss the AI integration. Which models are we currently using, and how are the prompts managed?",
+      "t_start": 414.93,
+      "t_end": 421.16
+    },
+    {
+      "id": "gt-33",
+      "speaker": "Developer A",
+      "text": "The backend primarily uses OpenAI's pinned model: gpt-five point four-two thousand twenty-six dash zero three dash zero-five. Most of the LLM clients use temperature zero to maintain consistent and predictable outputs.",
+      "t_start": 421.61,
+      "t_end": 435.45
+    },
+    {
+      "id": "gt-34",
+      "speaker": "Developer A",
+      "text": "We use LangChain to manage the prompt templates and model execution. The main configuration is in rag slash shared dot py. We have multiple clients, including llm for standard JSON responses, llm one for large outputs, llm two for large streaming responses.",
+      "t_start": 435.9,
+      "t_end": 452.72
+    },
+    {
+      "id": "gt-35",
+      "speaker": "Developer A",
+      "text": "llm three for medium-sized streaming responses, llm tool for tool-calling operations, llm tool i-d for tool identification. There is also a newer llm voice client specifically for Otto's spoken responses.",
+      "t_start": 453.17,
+      "t_end": 466.6
+    },
+    {
+      "id": "gt-36",
+      "speaker": "Developer A",
+      "text": "It uses temperature zero point seven, with a four-thousand-token output limit and a forty-five-second timeout.",
+      "t_start": 467.05,
+      "t_end": 473.36
+    },
+    {
+      "id": "gt-37",
+      "speaker": "Developer B",
+      "text": "Why do we have so many different clients if they are all using the same OpenAI model?",
+      "t_start": 473.81,
+      "t_end": 478.41
+    },
+    {
+      "id": "gt-38",
+      "speaker": "Developer A",
+      "text": "Because different operations have different requirements. Some prompts generate small JSON responses, while others generate very large outputs.",
+      "t_start": 478.86,
+      "t_end": 487.41
+    },
+    {
+      "id": "gt-39",
+      "speaker": "Developer A",
+      "text": "For example, the mental-action pipeline can produce extremely large responses. If we use the standard client, we may hit output-token limits or gateway timeouts. That's why we use the streaming client, particularly llm two, for larger generation stages.",
+      "t_start": 487.86,
+      "t_end": 503.86
+    },
+    {
+      "id": "gt-40",
+      "speaker": "Developer B",
+      "text": "How are the prompts connected to the API routes?",
+      "t_start": 504.31,
+      "t_end": 507.14
+    },
+    {
+      "id": "gt-41",
+      "speaker": "Developer A",
+      "text": "We use something called a chain ID. When a route needs an AI response, it prepares the required input, serialises it into JSON and passes it to cached underscore llm underscore invoke along with the chain ID.",
+      "t_start": 507.59,
+      "t_end": 519.63
+    },
+    {
+      "id": "gt-42",
+      "speaker": "Developer A",
+      "text": "The shared module identifies the appropriate prompt and model client. For example, the MVP generation route calls the MVP generation prompt through the corresponding chain ID. This keeps prompt definitions separate from the route implementation.",
+      "t_start": 520.08,
+      "t_end": 534.05
+    },
+    {
+      "id": "gt-43",
+      "speaker": "Developer B",
+      "text": "And how many prompts are currently documented?",
+      "t_start": 534.5,
+      "t_end": 537.13
+    },
+    {
+      "id": "gt-44",
+      "speaker": "Developer A",
+      "text": "The original prompt catalogue documented seventy-five entries: fifty-three production prompts, twelve testing prompts and ten unused prompts.",
+      "t_start": 537.58,
+      "t_end": 546.01
+    },
+    {
+      "id": "gt-45",
+      "speaker": "Developer A",
+      "text": "The latest update added nineteen prompt templates and two additional system texts. Some existing prompts were also modified. No existing prompt names were removed or renamed.",
+      "t_start": 546.46,
+      "t_end": 556.55
+    },
+    {
+      "id": "gt-46",
+      "speaker": "Developer A",
+      "text": "The prompt catalogue is organised into five main categories: Onboarding, Persona and Market. Business Process, R-O-P and F-J-A. Mental Action and Unity. Value Proposition, Strategy and K-P-Is. OKR, Otto and Other AI Calls.",
+      "t_start": 557.0,
+      "t_end": 572.93
+    },
+    {
+      "id": "gt-47",
+      "speaker": "Developer B",
+      "text": "If we need to modify an existing prompt, how should we test it?",
+      "t_start": 573.38,
+      "t_end": 577.29
+    },
+    {
+      "id": "gt-48",
+      "speaker": "Developer A",
+      "text": "We should first identify the route and chain ID, then locate the relevant prompt. After making a change, we should verify the input data, check the output structure and compare the result with previously saved outputs in rag slash output.",
+      "t_start": 577.74,
+      "t_end": 591.49
+    },
+    {
+      "id": "gt-49",
+      "speaker": "Developer A",
+      "text": "We should also remember that the LLM cache may return an old response even after changing the prompt. Using force underscore refresh or restarting the server can help, but we need to be careful because the current cache-clearing logic clears the entire process-wide cache, not just one user's entry.",
+      "t_start": 591.94,
+      "t_end": 608.47
+    },
+    {
+      "id": "gt-50",
+      "speaker": "Developer B",
+      "text": "Apart from the onboarding pipeline, which other modules should I understand before taking ownership?",
+      "t_start": 608.92,
+      "t_end": 614.33
+    },
+    {
+      "id": "gt-51",
+      "speaker": "Developer A",
+      "text": "There are several important modules. First, Authentication and User Management. The authentication module supports email O-T-P signup, login, refresh tokens, logout, password reset, OAuth login, team members and account deletion.",
+      "t_start": 614.78,
+      "t_end": 630.36
+    },
+    {
+      "id": "gt-52",
+      "speaker": "Developer A",
+      "text": "Access tokens last approximately sixty days, while refresh tokens last approximately three hundred sixty-five days.",
+      "t_start": 630.81,
+      "t_end": 638.07
+    },
+    {
+      "id": "gt-53",
+      "speaker": "Developer A",
+      "text": "Second, Meetings and Calendar. The meeting module handles team invitations, meeting creation, joining meetings, calendar entries and Stream video slash chat tokens. Daily meeting emails are handled by A-P-Scheduler.",
+      "t_start": 638.52,
+      "t_end": 651.87
+    },
+    {
+      "id": "gt-54",
+      "speaker": "Developer A",
+      "text": "Third, Otto \u2013 The AI Meeting Assistant. Otto is an important part of the system. It reads meeting transcripts, identifies commitments and questions, checks participants' seat calendars and proposes tasks.",
+      "t_start": 652.32,
+      "t_end": 664.93
+    },
+    {
+      "id": "gt-55",
+      "speaker": "Developer A",
+      "text": "The placement process has two important steps: POST slash otto slash propose-placement finds an available calendar slot and generates a signed placement token. POST slash otto slash confirm-placement verifies the token and then saves the task to the calendar.",
+      "t_start": 665.38,
+      "t_end": 680.3
+    },
+    {
+      "id": "gt-56",
+      "speaker": "Developer A",
+      "text": "Otto also has session memory to avoid duplicating proposals across multiple calls. In the latest update, its functionality has expanded to include spoken responses, private chat, company-related questions and knowledge-directory integration.",
+      "t_start": 680.75,
+      "t_end": 695.54
+    },
+    {
+      "id": "gt-57",
+      "speaker": "Developer A",
+      "text": "Fourth, OKR and Management. The OKR module supports spreadsheet uploads, classification, comparison, attachment and importing existing work trackers into the OKR structure.",
+      "t_start": 695.99,
+      "t_end": 707.84
+    },
+    {
+      "id": "gt-58",
+      "speaker": "Developer A",
+      "text": "The management module provides a dashboard containing business-cycle information, department objectives, activities and workload information. Fifth, X-B-R-L Reporting.",
+      "t_start": 708.29,
+      "t_end": 718.61
+    },
+    {
+      "id": "gt-59",
+      "speaker": "Developer A",
+      "text": "The X-B-R-L accounting functionality generates financial reports for an OKR activity. An important design decision here is that AI identifies what was used and the supporting evidence, while deterministic Python code performs the actual financial calculations.",
+      "t_start": 719.06,
+      "t_end": 734.67
+    },
+    {
+      "id": "gt-60",
+      "speaker": "Developer A",
+      "text": "The generated accounting report is saved and reused rather than regenerated every time. Sixth, Knowledge Directory.",
+      "t_start": 735.12,
+      "t_end": 741.79
+    },
+    {
+      "id": "gt-61",
+      "speaker": "Developer A",
+      "text": "This is one of the newer additions. Documents are stored in AWS S3, while their extracted text and associated information are stored in Neo4j.",
+      "t_start": 742.24,
+      "t_end": 751.28
+    },
+    {
+      "id": "gt-62",
+      "speaker": "Developer A",
+      "text": "The system can extract text and pictures, propose document tags using AI, index the content and allow Otto to search relevant documents.",
+      "t_start": 751.73,
+      "t_end": 760.26
+    },
+    {
+      "id": "gt-63",
+      "speaker": "Developer B",
+      "text": "That's helpful. So, the Knowledge Directory is also connected to Otto, rather than being an isolated document-upload feature?",
+      "t_start": 760.71,
+      "t_end": 768.29
+    },
+    {
+      "id": "gt-64",
+      "speaker": "Developer A",
+      "text": "Correct. The idea is to make relevant company knowledge available to the assistant while respecting the application's access permissions.",
+      "t_start": 768.74,
+      "t_end": 776.24
+    },
+    {
+      "id": "gt-65",
+      "speaker": "Developer B",
+      "text": "Now that I understand the architecture, I'd like to know which parts are fully completed and which ones still require development.",
+      "t_start": 776.69,
+      "t_end": 783.96
+    },
+    {
+      "id": "gt-66",
+      "speaker": "Developer A",
+      "text": "A significant amount of functionality has already been implemented. The main onboarding pipeline, O-NET integration, F-J-A phases, mental-action generation, Unity scene assembler, C-V-P, strategy, KPI generation, OKR cascade and seat calendar functionality are implemented.",
+      "t_start": 784.41,
+      "t_end": 803.63
+    },
+    {
+      "id": "gt-67",
+      "speaker": "Developer A",
+      "text": "Otto's task extraction and calendar placement, meeting management, pitch-deck analysis, RAG chat, management dashboard and OKR spreadsheet functionality are also present.",
+      "t_start": 804.08,
+      "t_end": 814.91
+    },
+    {
+      "id": "gt-68",
+      "speaker": "Developer A",
+      "text": "However, we still have some important issues. Let me highlight the main ones. First, F-J-A D-two and Mental Action Limits.",
+      "t_start": 815.36,
+      "t_end": 823.18
+    },
+    {
+      "id": "gt-69",
+      "speaker": "Developer A",
+      "text": "The F-J-A D-two route and mental-action generation route still contain test limitations that process only the first input. This means the complete set of activities is not processed.",
+      "t_start": 823.63,
+      "t_end": 833.79
+    },
+    {
+      "id": "gt-70",
+      "speaker": "Developer A",
+      "text": "Second, Cognitive Thinking Storage. The cognitive-thinking route generates scenes, but its database storage call remains commented out. The API can report success even though the scenes are not actually persisted.",
+      "t_start": 834.24,
+      "t_end": 846.61
+    },
+    {
+      "id": "gt-71",
+      "speaker": "Developer A",
+      "text": "Third, Missing Database Relationships. Some routes expect relationships that are never created. For example, HAS-C-V-P, HAS-OBJECTIVE and HAS-TURN.",
+      "t_start": 847.06,
+      "t_end": 856.51
+    },
+    {
+      "id": "gt-72",
+      "speaker": "Developer A",
+      "text": "This causes certain screens or editing operations to return incomplete data or fail to save changes.",
+      "t_start": 856.96,
+      "t_end": 862.53
+    },
+    {
+      "id": "gt-73",
+      "speaker": "Developer A",
+      "text": "Fourth, Static Screen Data. Some financial and business screens still return hardcoded data instead of reading actual database values.",
+      "t_start": 862.98,
+      "t_end": 871.01
+    },
+    {
+      "id": "gt-74",
+      "speaker": "Developer A",
+      "text": "Fifth, Authentication and Security. Some security issues remain open, including password reset verification and OAuth token verification.",
+      "t_start": 871.46,
+      "t_end": 880.5
+    },
+    {
+      "id": "gt-75",
+      "speaker": "Developer A",
+      "text": "There are also issues around certain administrative routes and access checks.",
+      "t_start": 880.95,
+      "t_end": 884.93
+    },
+    {
+      "id": "gt-76",
+      "speaker": "Developer A",
+      "text": "Sixth, Automated Testing. We still don't have a proper automated test suite in the repository. This is a major concern because several important modules have complex dependencies.",
+      "t_start": 885.38,
+      "t_end": 896.13
+    },
+    {
+      "id": "gt-77",
+      "speaker": "Developer B",
+      "text": "What about the performance and database connection issues? I remember you mentioned that there were some problems with Neo4j connections.",
+      "t_start": 896.58,
+      "t_end": 904.04
+    },
+    {
+      "id": "gt-78",
+      "speaker": "Developer A",
+      "text": "Yes. There has been an important improvement in the latest code. Previously, the application created a new Neo4j driver connection pool repeatedly, which could lead to connection and memory leaks.",
+      "t_start": 904.49,
+      "t_end": 915.83
+    },
+    {
+      "id": "gt-79",
+      "speaker": "Developer A",
+      "text": "That has now been changed to one shared connection pool per process. However, other performance issues remain. Some asynchronous routes still execute blocking operations directly, and the full onboarding process can involve approximately one thousand LLM calls.",
+      "t_start": 916.28,
+      "t_end": 931.43
+    },
+    {
+      "id": "gt-80",
+      "speaker": "Developer A",
+      "text": "The LLM cache also has some limitations because retries can clear the entire cache. So, we still need to work on performance and reliability.",
+      "t_start": 931.88,
+      "t_end": 940.62
+    },
+    {
+      "id": "gt-81",
+      "speaker": "Developer B",
+      "text": "Understood. We shouldn't assume that something is fixed just because the API returns a successful response.",
+      "t_start": 941.07,
+      "t_end": 947.64
+    },
+    {
+      "id": "gt-82",
+      "speaker": "Developer A",
+      "text": "Exactly. We need to verify the actual database state and downstream behaviour.",
+      "t_start": 948.09,
+      "t_end": 952.91
+    },
+    {
+      "id": "gt-83",
+      "speaker": "Developer B",
+      "text": "Before we discuss the action plan, are there any major changes in the latest November update that I should know about?",
+      "t_start": 953.36,
+      "t_end": 959.95
+    },
+    {
+      "id": "gt-84",
+      "speaker": "Developer A",
+      "text": "Yes, there are several important changes. First, the Neo4j connection pool has been consolidated into one shared pool.",
+      "t_start": 960.4,
+      "t_end": 967.94
+    },
+    {
+      "id": "gt-85",
+      "speaker": "Developer A",
+      "text": "Second, nineteen new prompt templates and two system texts were added, and twenty-one new chain IDs were wired into the shared module.",
+      "t_start": 968.39,
+      "t_end": 975.91
+    },
+    {
+      "id": "gt-86",
+      "speaker": "Developer A",
+      "text": "Third, Otto has received several enhancements, including voice responses, private chat, company-related questions, document knowledge search, more meeting request types and confirmation handling.",
+      "t_start": 976.36,
+      "t_end": 988.51
+    },
+    {
+      "id": "gt-87",
+      "speaker": "Developer A",
+      "text": "Fourth, the Knowledge Directory and Data Access by Role modules have been added. The application now includes knowledge slash, access slash and search slash functionality, along with report-section APIs and a new programme module.",
+      "t_start": 988.96,
+      "t_end": 1002.3
+    },
+    {
+      "id": "gt-88",
+      "speaker": "Developer A",
+      "text": "Fifth, the OKR import workflow has expanded, including spreadsheet mapping, planning, key-result generation and work-duration estimation. The X-B-R-L accounting workflow has also been rebuilt to use deterministic financial calculations.",
+      "t_start": 1002.75,
+      "t_end": 1017.31
+    },
+    {
+      "id": "gt-89",
+      "speaker": "Developer B",
+      "text": "And did these changes resolve the earlier security issues?",
+      "t_start": 1017.76,
+      "t_end": 1021.05
+    },
+    {
+      "id": "gt-90",
+      "speaker": "Developer A",
+      "text": "Some of them, yes. For example, the utils routes now require authentication, and several calendar-related user-ID checks have been implemented. The Neo4j driver issue is also fixed.",
+      "t_start": 1021.5,
+      "t_end": 1033.02
+    },
+    {
+      "id": "gt-91",
+      "speaker": "Developer A",
+      "text": "However, password-reset O-T-P verification and OAuth provider-token verification are still open issues. The credential in the commented configuration line also still needs to be rotated.",
+      "t_start": 1033.47,
+      "t_end": 1044.65
+    },
+    {
+      "id": "gt-92",
+      "speaker": "Developer A",
+      "text": "So, we should use the latest status rather than relying only on the original handover notes.",
+      "t_start": 1045.1,
+      "t_end": 1050.37
+    },
+    {
+      "id": "gt-93",
+      "speaker": "Developer B",
+      "text": "Let's say an AI generation route starts returning incorrect data or fails to generate valid JSON. How should I approach debugging it?",
+      "t_start": 1050.82,
+      "t_end": 1059.17
+    },
+    {
+      "id": "gt-94",
+      "speaker": "Developer A",
+      "text": "We have a troubleshooting approach documented for this. I recommend following these steps. First, identify the API route and its chain ID.",
+      "t_start": 1059.62,
+      "t_end": 1068.12
+    },
+    {
+      "id": "gt-95",
+      "speaker": "Developer A",
+      "text": "Second, verify the input data coming from Neo4j. Missing upstream information is one of the most common reasons for incorrect AI outputs. Third, check whether the response is coming from the LLM cache.",
+      "t_start": 1068.57,
+      "t_end": 1080.96
+    },
+    {
+      "id": "gt-96",
+      "speaker": "Developer A",
+      "text": "Fourth, inspect the logs for token-limit issues or gateway timeouts. Fifth, validate the JSON structure and ensure that all required keys are present.",
+      "t_start": 1081.41,
+      "t_end": 1090.48
+    },
+    {
+      "id": "gt-97",
+      "speaker": "Developer A",
+      "text": "Finally, check whether the database storage function and the downstream reader use the same field names.",
+      "t_start": 1090.93,
+      "t_end": 1096.53
+    },
+    {
+      "id": "gt-98",
+      "speaker": "Developer B",
+      "text": "What are the most common failures?",
+      "t_start": 1096.98,
+      "t_end": 1098.85
+    },
+    {
+      "id": "gt-99",
+      "speaker": "Developer A",
+      "text": "There are several. JSON output gets truncated because the response reaches its token limit. Large requests fail with a five-zero-four gateway timeout.",
+      "t_start": 1099.3,
+      "t_end": 1108.3
+    },
+    {
+      "id": "gt-100",
+      "speaker": "Developer A",
+      "text": "The model returns invalid JSON or additional text. The output contains an incorrect number of expected items. Required keys are missing or renamed.",
+      "t_start": 1108.75,
+      "t_end": 1117.54
+    },
+    {
+      "id": "gt-101",
+      "speaker": "Developer A",
+      "text": "An old cached response appears after a prompt change. A downstream screen shows no data because an earlier pipeline step did not run.",
+      "t_start": 1117.99,
+      "t_end": 1125.89
+    },
+    {
+      "id": "gt-102",
+      "speaker": "Developer A",
+      "text": "For example, if the KPI generation step expects a particular number of KPIs but receives fewer, the process can fail its validation.",
+      "t_start": 1126.34,
+      "t_end": 1134.99
+    },
+    {
+      "id": "gt-103",
+      "speaker": "Developer A",
+      "text": "We should not immediately change the prompt in every situation. Sometimes the actual issue is in the input data, database storage or API response handling.",
+      "t_start": 1135.44,
+      "t_end": 1144.43
+    },
+    {
+      "id": "gt-104",
+      "speaker": "Developer B",
+      "text": "That's a good point. We should isolate the source of the problem before changing anything.",
+      "t_start": 1144.88,
+      "t_end": 1149.75
+    },
+    {
+      "id": "gt-105",
+      "speaker": "Developer A",
+      "text": "Exactly. Also, whenever we modify a prompt, we should change one thing at a time, rerun a controlled test and compare the new output against the previously saved output.",
+      "t_start": 1150.2,
+      "t_end": 1160.43
+    },
+    {
+      "id": "gt-106",
+      "speaker": "Developer B",
+      "text": "If you had to highlight the most critical technical risks in this project, what would they be?",
+      "t_start": 1160.88,
+      "t_end": 1165.86
+    },
+    {
+      "id": "gt-107",
+      "speaker": "Developer A",
+      "text": "I would put security first. We need to address the following: Password reset currently trusts a client-supplied o-t-p verified value instead of independently validating the O-T-P.",
+      "t_start": 1166.31,
+      "t_end": 1177.11
+    },
+    {
+      "id": "gt-108",
+      "speaker": "Developer A",
+      "text": "OAuth login does not properly verify the provider's identity token. The admin slash run-reminders-now route still lacks authentication. Some access-control and user-scoping checks need further review.",
+      "t_start": 1177.56,
+      "t_end": 1189.25
+    },
+    {
+      "id": "gt-109",
+      "speaker": "Developer A",
+      "text": "A database credential remains in a commented configuration line and Git history. It must be rotated. Then there are reliability concerns.",
+      "t_start": 1189.7,
+      "t_end": 1197.58
+    },
+    {
+      "id": "gt-110",
+      "speaker": "Developer A",
+      "text": "We need to address the one-activity test limits, the missing cognitive-thinking storage, missing database relationships and the absence of automated tests.",
+      "t_start": 1198.03,
+      "t_end": 1206.57
+    },
+    {
+      "id": "gt-111",
+      "speaker": "Developer A",
+      "text": "We should also review Otto's database-query generation path because it uses an AI-generated Cypher query that is subsequently executed. The query-validation function needs careful security review.",
+      "t_start": 1207.02,
+      "t_end": 1218.36
+    },
+    {
+      "id": "gt-112",
+      "speaker": "Developer B",
+      "text": "And what about the calendar functionality?",
+      "t_start": 1218.81,
+      "t_end": 1221.13
+    },
+    {
+      "id": "gt-113",
+      "speaker": "Developer A",
+      "text": "There is one important issue. Regenerating a calendar with force equals true can silently remove tasks that Otto previously confirmed.",
+      "t_start": 1221.58,
+      "t_end": 1229.27
+    },
+    {
+      "id": "gt-114",
+      "speaker": "Developer A",
+      "text": "We need to make sure that confirmed tasks are preserved or handled intentionally when calendars are regenerated. Also, some calendar display labels are still provisional.",
+      "t_start": 1229.72,
+      "t_end": 1239.13
+    },
+    {
+      "id": "gt-115",
+      "speaker": "Developer B",
+      "text": "Thanks for explaining everything. If I'm taking ownership of this backend now, what would you recommend I focus on during my first two weeks?",
+      "t_start": 1239.58,
+      "t_end": 1248.03
+    },
+    {
+      "id": "gt-116",
+      "speaker": "Developer A",
+      "text": "I would divide the work into six priorities. Priority one \u2013 Security Fixes. Implement proper O-T-P validation for password reset.",
+      "t_start": 1248.48,
+      "t_end": 1257.21
+    },
+    {
+      "id": "gt-117",
+      "speaker": "Developer A",
+      "text": "Verify Google, Microsoft and Apple OAuth tokens. Review route-level authentication and authorisation. Verify user IDs against the authenticated user. Rotate the exposed database credential.",
+      "t_start": 1257.66,
+      "t_end": 1269.94
+    },
+    {
+      "id": "gt-118",
+      "speaker": "Developer A",
+      "text": "Priority two \u2013 Database and Data Integrity. Fix K-P-I and issue IDs so they are unique per user. Correct K-P-I field mismatches. Review missing relationships such as HAS-C-V-P, HAS-OBJECTIVE and HAS-TURN.",
+      "t_start": 1270.39,
+      "t_end": 1283.47
+    },
+    {
+      "id": "gt-119",
+      "speaker": "Developer A",
+      "text": "Ensure data is correctly stored and retrieved. Priority three \u2013 Pipeline Completion. Remove the one-input test limitation from F-J-A D-two. Remove the one-activity limitation from mental-action generation.",
+      "t_start": 1283.92,
+      "t_end": 1296.52
+    },
+    {
+      "id": "gt-120",
+      "speaker": "Developer A",
+      "text": "Implement actual cognitive-thinking scene persistence. Priority four \u2013 Performance Optimisation. Review blocking operations inside asynchronous routes.",
+      "t_start": 1296.97,
+      "t_end": 1306.42
+    },
+    {
+      "id": "gt-121",
+      "speaker": "Developer A",
+      "text": "Reapply and verify the tested non-blocking execution improvements. Review LLM caching and retry behaviour. Monitor Neo4j connection-pool usage.",
+      "t_start": 1306.87,
+      "t_end": 1316.21
+    },
+    {
+      "id": "gt-122",
+      "speaker": "Developer A",
+      "text": "Priority five \u2013 Testing. Introduce automated backend tests. Test authentication and access permissions. Test the complete onboarding pipeline.",
+      "t_start": 1316.66,
+      "t_end": 1326.0
+    },
+    {
+      "id": "gt-123",
+      "speaker": "Developer A",
+      "text": "Validate AI response structures and database persistence. Test Otto's task extraction and calendar placement. Priority six \u2013 Documentation and Maintenance.",
+      "t_start": 1326.45,
+      "t_end": 1336.04
+    },
+    {
+      "id": "gt-124",
+      "speaker": "Developer A",
+      "text": "Review the prompt catalogue. Keep the API documentation updated. Remove or clearly isolate obsolete test routes. Review old and duplicate code.",
+      "t_start": 1336.49,
+      "t_end": 1345.69
+    },
+    {
+      "id": "gt-125",
+      "speaker": "Developer A",
+      "text": "Document important technical decisions.",
+      "t_start": 1346.14,
+      "t_end": 1348.48
+    },
+    {
+      "id": "gt-126",
+      "speaker": "Developer B",
+      "text": "That gives me a clear direction. I think I'll first familiarise myself with main dot py, shared dot py, utils dot py and modular pipeline dot py.",
+      "t_start": 1348.93,
+      "t_end": 1358.59
+    },
+    {
+      "id": "gt-127",
+      "speaker": "Developer B",
+      "text": "Then I'll understand the database relationships and review the security issues before making any significant changes. I'll also make sure that any changes are tested against the current main branch rather than relying on older optimisation patches.",
+      "t_start": 1359.04,
+      "t_end": 1373.0
+    },
+    {
+      "id": "gt-128",
+      "speaker": "Developer A",
+      "text": "That's the right approach. One additional recommendation: be particularly careful when merging changes. We have previously experienced code being overwritten or old files being reintroduced during merges.",
+      "t_start": 1373.45,
+      "t_end": 1385.29
+    },
+    {
+      "id": "gt-129",
+      "speaker": "Developer A",
+      "text": "So, review the Git history and compare the current implementation before removing or replacing anything.",
+      "t_start": 1385.74,
+      "t_end": 1391.47
+    },
+    {
+      "id": "gt-130",
+      "speaker": "Developer B",
+      "text": "Understood. I'll also keep the existing output examples as a reference when modifying the AI prompts.",
+      "t_start": 1391.92,
+      "t_end": 1398.03
+    },
+    {
+      "id": "gt-131",
+      "speaker": "Developer B",
+      "text": "I think I have a much better understanding of the backend now. To summarise, EarnOut is built around FastAPI, Neo4j and OpenAI, with a large AI-driven business-planning pipeline.",
+      "t_start": 1398.48,
+      "t_end": 1409.93
+    },
+    {
+      "id": "gt-132",
+      "speaker": "Developer B",
+      "text": "The core generation features are implemented, and we have additional modules for Otto, meetings, OKR, X-B-R-L, document management and reporting.",
+      "t_start": 1410.38,
+      "t_end": 1420.61
+    },
+    {
+      "id": "gt-133",
+      "speaker": "Developer B",
+      "text": "However, our immediate focus should be security, data integrity, completing the remaining pipeline limitations, improving performance and introducing automated testing.",
+      "t_start": 1421.06,
+      "t_end": 1431.87
+    },
+    {
+      "id": "gt-134",
+      "speaker": "Developer B",
+      "text": "Is there anything important I've missed?",
+      "t_start": 1432.32,
+      "t_end": 1434.3
+    },
+    {
+      "id": "gt-135",
+      "speaker": "Developer A",
+      "text": "No, that's a good summary. The most important thing is to understand that this is a highly interconnected system.",
+      "t_start": 1434.75,
+      "t_end": 1440.97
+    },
+    {
+      "id": "gt-136",
+      "speaker": "Developer A",
+      "text": "A small change in one prompt, database relationship or storage function can affect multiple downstream screens and workflows.",
+      "t_start": 1441.42,
+      "t_end": 1448.62
+    },
+    {
+      "id": "gt-137",
+      "speaker": "Developer A",
+      "text": "So, before changing anything, understand the complete flow, verify the existing implementation and test the result.",
+      "t_start": 1449.07,
+      "t_end": 1456.49
+    },
+    {
+      "id": "gt-138",
+      "speaker": "Developer A",
+      "text": "The handover manual contains the architecture, API flows, model configuration, prompt catalogue, troubleshooting procedures and the latest status re-check.",
+      "t_start": 1456.94,
+      "t_end": 1466.66
+    },
+    {
+      "id": "gt-139",
+      "speaker": "Developer A",
+      "text": "It should be your primary reference while taking over the project.",
+      "t_start": 1467.11,
+      "t_end": 1470.47
+    },
+    {
+      "id": "gt-140",
+      "speaker": "Developer B",
+      "text": "Perfect. Thanks for taking the time to explain everything. I'll start by reviewing the security items and then move towards the pipeline and performance improvements.",
+      "t_start": 1470.92,
+      "t_end": 1480.57
+    },
+    {
+      "id": "gt-141",
+      "speaker": "Developer A",
+      "text": "Sounds good. Thanks, and welcome to the project.",
+      "t_start": 1481.02,
+      "t_end": 1484.2
+    },
+    {
+      "id": "gt-142",
+      "speaker": "Developer A",
+      "text": "Meeting concluded.",
+      "t_start": 1484.65,
+      "t_end": 1485.62
+    }
+  ],
+  "notes": [
+    "Ground-truth timestamps are used for the alignment fallback and for evaluating ASR lag.",
+    "The content covers the complete EarnOut Backend handover meeting between Developer A and Developer B.",
+    "Voice generation: macOS say (Developer A=21m00Tcm4TlvDq8ikWAM, Developer B=pNInz6obpgDQGcFmaJgB)."
+  ]
+}

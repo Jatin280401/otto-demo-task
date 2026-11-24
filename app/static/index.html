@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Otto Live</title>
+  <link rel="stylesheet" href="/static/styles.css?v=4" />
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">O<span></span></div>
+        <h1>Otto Live</h1>
+      </div>
+    </header>
+
+    <main class="grid">
+      <section class="col left-col">
+        <div class="card stage">
+          <div class="stage-head">
+            <div>
+              <span class="eyebrow">MEETING AUDIO</span>
+              <div class="clock-row">
+                <span id="meetingClock">00:00</span>
+                <span class="audio-badge" id="audioBadge">idle</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="wave-wrap">
+            <div class="wave-overlay">
+              <span id="waveLabel">waiting for audio</span>
+            </div>
+          </div>
+
+          <div class="stage-controls">
+            <button class="btn mint" id="sampleBtn">▶ Sample meeting</button>
+          </div>
+        </div>
+
+        <div class="card transcript-card">
+          <div class="card-head">
+            <div>
+              <h2>Live transcript</h2>
+              <p>Transcript grows in real time as audio plays.</p>
+            </div>
+          </div>
+          <div class="transcript" id="transcript">
+            <div class="empty">
+              <div class="empty-icon">◉</div>
+              <h3>No audio yet</h3>
+              <p>Click "Sample meeting" to start the demo.</p>
+              <button class="btn mint" data-action="demo">▶ Run demo</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="col chat-col card">
+        <div class="chat-head">
+          <div class="avatar">O</div>
+          <div class="chat-title">
+            <h2>Chat</h2>
+            <p id="engineLine">Otto is ready</p>
+          </div>
+        </div>
+
+        <div class="chat-list" id="chat">
+          <div class="empty chat-empty">
+            <div class="empty-icon">O</div>
+            <h3>Ask Otto about the meeting</h3>
+            <p>Ask a question. Otto answers from the live audio transcript and the project manual.</p>
+          </div>
+        </div>
+
+        <div class="quick-row" id="quickRow">
+          <button data-q="What model does Otto use?">Which model?</button>
+          <button data-q="What database does EarnOut use?">Database?</button>
+          <button data-q="What are the handover priorities?">Priorities</button>
+        </div>
+
+        <form class="composer" id="chatForm">
+          <textarea id="chatInput" rows="1" placeholder="Ask Otto…" maxlength="4000"></textarea>
+          <button class="send" type="submit" id="sendBtn" aria-label="Send">↑</button>
+        </form>
+      </section>
+    </main>
+
+    <audio id="roomAudio" src="/demo/sample_meeting.mp3" preload="auto"></audio>
+    <div class="toast" id="toast"></div>
+
+  </div>
+
+  <script src="/static/app.js?v=4"></script>
+</body>
+</html>
