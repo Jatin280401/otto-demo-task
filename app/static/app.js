@@ -14,6 +14,7 @@ const state = {
   lastAssistant: null,
   lastQuestion: "",
   demoPlaying: false,
+  mic: null,
   chatLock: false,
   clockAt: performance.now(),
 };
@@ -101,6 +102,31 @@ function sendWS(payload) {
     return true;
   }
   return false;
+}
+function floatToBase64(frame) {
+  const pcm = new Int16Array(frame.length);
+  for (let i = 0; i < frame.length; i++) {
+    const v = Math.max(-1, Math.min(1, frame[i]));
+    pcm[i] = v < 0 ? v * 0x8000 : v * 0x7fff;
+  }
+  const bytes = new Uint8Array(pcm.buffer);
+  let binary = "";
+  for (let i = 0; i < bytes.length; i += 8192) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + 8192));
+  }
+  return btoa(binary);
+}
+function waitForWS(timeoutMs = 6000) {
+  if (state.ws && state.ws.readyState === WebSocket.OPEN) return Promise.resolve(true);
+  return new Promise(resolve => {
+    const started = Date.now();
+    const check = () => {
+      if (state.ws && state.ws.readyState === WebSocket.OPEN) return resolve(true);
+      if (Date.now() - started >= timeoutMs) return resolve(false);
+      setTimeout(check, 120);
+    };
+    check();
+  });
 }
 function handleWS(msg) {
   switch (msg.type) {
@@ -192,8 +218,11 @@ function renderTranscript() {
     el.innerHTML = `<div class="empty">
       <div class="empty-icon">◉</div>
       <h3>No audio yet</h3>
-      <p>Click "Sample meeting" to start the demo.</p>
-      <button class="btn mint" data-action="demo">▶ Run demo</button>
+      <p>Play the sample meeting or use your microphone to start.</p>
+      <div class="empty-actions">
+        <button class="btn mint" data-action="demo">▶ Run demo</button>
+        <button class="btn" data-action="mic">🎙 Use mic</button>
+      </div>
     </div>`;
     return;
   }
@@ -333,6 +362,7 @@ function sendChat(text) {
 
 async function runDemo() {
   if (state.demoPlaying) { await stopDemo(); return; }
+  if (state.mic) await stopMic();
   if (!state.sessionId) {
     try {
       const meeting = await api("/api/meetings", {
@@ -372,6 +402,70 @@ async function stopAudioServer() {
   updateAudioUI();
 }
 
+async function startMic() {
+  if (state.mic) return;
+  if (state.demoPlaying) await stopDemo();
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    toast("Microphone needs a secure page (HTTPS or localhost)", true);
+    return;
+  }
+  if (!await waitForWS()) {
+    toast("Otto is not connected yet — try again", true);
+    return;
+  }
+  let stream = null;
+  let ctx = null;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+    });
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    ctx = new Ctx();
+    await ctx.audioWorklet.addModule("/static/audio-worklet.js");
+    if (ctx.state === "suspended") await ctx.resume();
+    const source = ctx.createMediaStreamSource(stream);
+    const node = new AudioWorkletNode(ctx, "otto-capture");
+    node.port.onmessage = (event) => {
+      const frame = event.data;
+      if (frame && frame.length) sendWS({ type: "audio", pcm: floatToBase64(frame) });
+    };
+    source.connect(node);
+    state.mic = { stream, ctx, source, node };
+    sendWS({ type: "control", action: "start_mic" });
+    const btn = $("#micBtn");
+    if (btn) {
+      btn.innerHTML = `<span class="play">■</span> Stop mic`;
+      btn.classList.add("recording");
+    }
+    toast("Listening to your microphone…");
+  } catch (err) {
+    if (stream) stream.getTracks().forEach(track => track.stop());
+    if (ctx) { try { await ctx.close(); } catch (_) {} }
+    toast(`Microphone unavailable: ${err.message}`, true);
+  }
+}
+async function stopMic() {
+  const mic = state.mic;
+  state.mic = null;
+  if (mic) {
+    mic.node.port.onmessage = null;
+    try { mic.source.disconnect(); } catch (_) {}
+    try { mic.node.disconnect(); } catch (_) {}
+    mic.stream.getTracks().forEach(track => track.stop());
+    try { await mic.ctx.close(); } catch (_) {}
+  }
+  await stopAudioServer();
+  const btn = $("#micBtn");
+  if (btn) {
+    btn.innerHTML = `🎙 Use microphone`;
+    btn.classList.remove("recording");
+  }
+}
+function toggleMic() {
+  if (state.mic) stopMic();
+  else startMic();
+}
+
 document.querySelectorAll("#quickRow button").forEach(btn => {
   btn.addEventListener("click", () => sendChat(btn.dataset.q));
 });
@@ -387,11 +481,15 @@ if (chatInput) {
 
 const sampleBtn = $("#sampleBtn");
 if (sampleBtn) sampleBtn.addEventListener("click", runDemo);
+const micBtn = $("#micBtn");
+if (micBtn) micBtn.addEventListener("click", toggleMic);
 const transcriptEl = $("#transcript");
 if (transcriptEl) {
   transcriptEl.addEventListener("click", (e) => {
     const demoBtn = e.target.closest('[data-action="demo"]');
+    const micAction = e.target.closest('[data-action="mic"]');
     if (demoBtn) runDemo();
+    else if (micAction) startMic();
   });
 }
 
