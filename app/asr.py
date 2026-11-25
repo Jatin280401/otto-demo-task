@@ -33,8 +33,10 @@ def normalize_speaker(raw: str) -> str:
     return "Speaker B" if re.search(r"\bB\b", name, re.I) or name.lower().endswith(" b") else "Speaker A"
 
 class SpeakerMap:
-    def __init__(self, path: Optional[Path] = None):
+    def __init__(self, path: Optional[Path] = None, enabled: bool = True):
         self.turns: list[tuple[float, float, str]] = []
+        if not enabled:
+            return
         try:
             data = json.loads((path or settings.sample_transcript).read_text())
             for s in data.get("segments", []):
@@ -152,7 +154,8 @@ class BaseASR:
 
 class WhisperStreamingASR(BaseASR):
 
-    def __init__(self, session, emit_partial: EmitPartial, emit_final: EmitFinal):
+    def __init__(self, session, emit_partial: EmitPartial, emit_final: EmitFinal,
+                 speaker_map: Optional[SpeakerMap] = None):
         super().__init__(session, emit_partial, emit_final)
         self.preroll: list[np.ndarray] = []
         self.utterance: list[np.ndarray] = []
@@ -164,7 +167,7 @@ class WhisperStreamingASR(BaseASR):
         self.noise_floor = 0.006
         self.partial_task: Optional[asyncio.Task] = None
         self.infer_lock = asyncio.Lock()
-        self.speaker_map = get_speaker_map()
+        self.speaker_map = speaker_map or get_speaker_map()
         self.utterance_speaker = "Speaker A"
 
     async def run(self) -> None:
@@ -350,12 +353,14 @@ class AlignmentASR(BaseASR):
             )
             await self.emit_final(segment)
 
-def build_asr(session, emit_partial: EmitPartial, emit_final: EmitFinal) -> BaseASR:
+def build_asr(session, emit_partial: EmitPartial, emit_final: EmitFinal,
+              use_speaker_map: bool = True) -> BaseASR:
     mode = (settings.asr_engine or "auto").lower()
     if mode == "off":
-        return AlignmentASR(session, emit_partial, emit_final)  
+        return AlignmentASR(session, emit_partial, emit_final)
     if mode == "alignment":
         return AlignmentASR(session, emit_partial, emit_final)
     if WHISPER_IMPORTED and (mode == "whisper" or _whisper_model is not None):
-        return WhisperStreamingASR(session, emit_partial, emit_final)
+        speaker_map = get_speaker_map() if use_speaker_map else SpeakerMap(enabled=False)
+        return WhisperStreamingASR(session, emit_partial, emit_final, speaker_map=speaker_map)
     return AlignmentASR(session, emit_partial, emit_final)
