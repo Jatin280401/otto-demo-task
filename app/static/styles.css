@@ -88,6 +88,8 @@ body {
 .btn:active { transform: translateY(0); }
 .btn.mint { color: var(--mint); border-color: rgba(94, 234, 212, 0.32); background: var(--mint-dim); }
 .btn.mint:hover { background: rgba(94, 234, 212, 0.2); }
+.btn.recording { color: var(--red); border-color: rgba(251, 113, 133, 0.45); background: rgba(251, 113, 133, 0.12); }
+.empty-actions { display: flex; gap: 7px; flex-wrap: wrap; justify-content: center; }
 .play { font-size: 10px; }
 
 .grid {
