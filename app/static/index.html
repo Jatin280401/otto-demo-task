@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Otto Live</title>
-  <link rel="stylesheet" href="/static/styles.css?v=4" />
+  <link rel="stylesheet" href="/static/styles.css?v=5" />
 </head>
 <body>
   <div class="app">
@@ -36,6 +36,7 @@
 
           <div class="stage-controls">
             <button class="btn mint" id="sampleBtn">▶ Sample meeting</button>
+            <button class="btn" id="micBtn">🎙 Use microphone</button>
           </div>
         </div>
 
@@ -50,8 +51,11 @@
             <div class="empty">
               <div class="empty-icon">◉</div>
               <h3>No audio yet</h3>
-              <p>Click "Sample meeting" to start the demo.</p>
-              <button class="btn mint" data-action="demo">▶ Run demo</button>
+              <p>Play the sample meeting or use your microphone to start.</p>
+              <div class="empty-actions">
+                <button class="btn mint" data-action="demo">▶ Run demo</button>
+                <button class="btn" data-action="mic">🎙 Use mic</button>
+              </div>
             </div>
           </div>
         </div>
@@ -92,6 +96,6 @@
 
   </div>
 
-  <script src="/static/app.js?v=4"></script>
+  <script src="/static/app.js?v=5"></script>
 </body>
 </html>
