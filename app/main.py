@@ -33,7 +33,7 @@ from .audio import AudioStreamer, resolve_local_audio
 from .config import DATA_DIR, PROMPTS_DIR, STATIC_DIR, UPLOAD_DIR, settings
 from .kb import kb
 from .llm import LLMClient
-from .meeting import MeetingSession, store
+from .meeting import AudioState, MeetingSession, store
 from .models import (
     ChatMessage,
     ChatRequest,
@@ -94,7 +94,7 @@ def runtime_info() -> dict:
         "partial_interval_ms": settings.partial_interval_ms,
     }
 
-async def ensure_asr(session: MeetingSession) -> object:
+async def ensure_asr(session: MeetingSession, use_speaker_map: bool = True) -> object:
     existing = asrs.get(session.id)
     if existing:
         return existing
@@ -115,7 +115,7 @@ async def ensure_asr(session: MeetingSession) -> object:
             await session.emit({"type": "transcript.segment", "segment": segment.to_dict()})
             orchestrator.schedule_ambient(session)
 
-    asr = build_asr(session, on_partial, on_final)
+    asr = build_asr(session, on_partial, on_final, use_speaker_map=use_speaker_map)
     asrs[session.id] = asr
     await asr.start()
     return asr
@@ -262,7 +262,7 @@ async def _start_audio(session: MeetingSession, source: str, mode: str, start_at
         await stop_audio(session, stop_asr=True)
     session.stream_started_wall = time.time()
     session.audio.offset_s = max(0.0, start_at_s)
-    asr = await ensure_asr(session)
+    asr = await ensure_asr(session, use_speaker_map=(mode == "sample"))
     streamer = AudioStreamer(session, asr.feed)
     streamers[session.id] = streamer
     await streamer.start(source, mode=mode, start_at_s=start_at_s)
@@ -412,8 +412,9 @@ async def meeting_ws(ws: WebSocket, session_id: str):
                     session.audio.source = "microphone"
                     session.audio.status = "streaming"
                     session.audio.started_at = time.time()
-                    session.audio.offset_s = session.clock()
-                asr = await ensure_asr(session)
+                    session.audio.offset_s = 0.0
+                    await session.emit({"type": "status", "audio": session.audio.to_dict()})
+                asr = await ensure_asr(session, use_speaker_map=False)
                 await asr.feed(pcm)
                 session.audio.samples += len(pcm)
             elif kind == "chat":
@@ -454,6 +455,13 @@ async def meeting_ws(ws: WebSocket, session_id: str):
                 if action == "ambient":
                     session.ambient = bool(msg.get("enabled"))
                     await session.emit({"type": "ambient", "enabled": session.ambient})
+                elif action == "start_mic":
+                    await stop_audio(session, stop_asr=True)
+                    session.stream_started_wall = None
+                    session.audio = AudioState(
+                        mode="mic", source="microphone", status="streaming", started_at=time.time()
+                    )
+                    await session.emit({"type": "status", "audio": session.audio.to_dict()})
                 elif action == "stop_audio":
                     await stop_audio(session, stop_asr=True)
                 elif action == "ping":
